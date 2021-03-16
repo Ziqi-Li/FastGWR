@@ -53,9 +53,11 @@ where:
 
 The input needs to be prepared in this order:
 
-| X-coord | Y-coord | y | X1 | X2 | ...| Xk |
-
-|:-------:|:-------:|:-:|:--:|:--:|:--:|:--:|
+|   | X-coord | y-coord | y    | X1  | X2  | X3  | Xk  |
+|---|---------|---------|------|-----|-----|-----|-----|
+|   | ...     | ...     | ...  | ... | ... | ... | ... |
+|   | ...     | ...     | ...  | ... | ... | ... | ... |
+|   |         |         |      |     |     |     |     |
 
 ```
 where:
@@ -69,4 +71,4 @@ X1...Xk: independent variables
 
 [FastGWR](https://www.tandfonline.com/doi/full/10.1080/13658816.2018.1521523)
 
-Li,Z., Fotheringham,A.S., Li,W., Oshan,T. (2019) Fast Geographically Weighted Regression (FastGWR): A Scalable Algorithm to Investigate Spatial Process Heterogeneity in Millions of Observations. International Journal of Geographic Information Science. doi: 10.1080/13658816.2018.1521523
+Li, Z., Fotheringham, A. S., Li, W., Oshan, T. (2019). Fast Geographically Weighted Regression (FastGWR): A Scalable Algorithm to Investigate Spatial Process Heterogeneity in Millions of Observations. International Journal of Geographic Information Science. doi: 10.1080/13658816.2018.1521523.
