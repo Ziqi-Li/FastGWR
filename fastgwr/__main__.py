@@ -17,7 +17,7 @@ def main():
 def run(np, data, out, adaptive, constant, bw, minbw):
     """FastGWR"""
     
-    command = 'mpiexec ' + ' -np ' + str(np) + ' python ' + ' fastgwr/fastgwr-mpi.py ' + ' -data ' + data + ' -out ' + out
+    command = 'mpiexec ' + ' -np ' + str(np) + ' python ' + ' fastgwr/fastgwr_mpi.py ' + ' -data ' + data + ' -out ' + out
     
     if adaptive:
         command += ' -a '
