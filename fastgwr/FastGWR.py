@@ -80,7 +80,7 @@ class FastGWR:
         self.y = input[:,2].reshape(-1,1)
         self.n = input.shape[0]
         if self.constant:
-            self.X = np.hstack([np.ones((n,1)),input[:,3:]])
+            self.X = np.hstack([np.ones((self.n,1)),input[:,3:]])
         else:
             self.X = input[:,3:]
         self.coords = input[:,:2]
@@ -91,7 +91,7 @@ class FastGWR:
             minbw = float('Inf')
             maxbw = -100
             for i in range(self.n):
-                dist = cdist([coords[i]],coords)
+                dist = cdist([self.coords[i]],self.coords)
                 tempmax = np.max(dist)
                 tempmin = np.min(dist[np.nonzero(dist)])
                 if tempmax > maxbw:

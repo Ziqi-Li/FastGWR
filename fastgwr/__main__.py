@@ -7,7 +7,7 @@ def main():
     pass
 
 @main.command()
-@click.option("-np", default=2, required=True)
+@click.option("-np", default=4, required=True)
 @click.option("-data", required=True)
 @click.option("-out", default="fastgwr_rslt.csv", required=False)
 @click.option("-adaptive/-fixed" ,default=True,required=True)
