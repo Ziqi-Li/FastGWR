@@ -107,9 +107,9 @@ class FastGWR:
             self.maxbw = self.n
             if self.minbw is None:
                 self.minbw = 40 + 2 * self.k
-        
-
-    def local_fit(self, i, y, X, bw, final=False, mgwr=False):
+                
+                
+    def build_wi(self, i, bw):
     
         dist = cdist([self.coords[i]], self.coords).reshape(-1)
         #dist = np.sqrt(np.sum((self.coords[i] - self.coords)**2, axis=1)).reshape(-1)
@@ -118,13 +118,17 @@ class FastGWR:
         if self.fixed:
             wi = np.exp(-0.5*(dist/bw)**2).reshape(-1,1)
         #adaptive bisquare
-        
         else:
             maxd = np.partition(dist, int(bw)-1)[int(bw)-1]*1.0000001
             zs = dist/maxd
             zs[zs>=1] = 1
             wi = ((1-(zs)**2)**2).reshape(-1,1)
+        
+        return wi
+        
 
+    def local_fit(self, i, y, X, bw, final=False, mgwr=False):
+        wi = self.build_wi(i, bw)
         #Last fitting, return more stats
         if final:
             xT = (X * wi).T
@@ -252,9 +256,19 @@ class FastGWR:
                 data[:,-k:] = np.sqrt(data[:,-k:]*sigma2_v1)
                 
                 
+                header="index,residual,influ,"
+                varNames = np.genfromtxt(self.fname, dtype=str, delimiter=',',names=True, max_rows=1).dtype.names[3:]
+                if self.constant:
+                    varNames = ['intercept'] + list(varNames)
+                for x in varNames:
+                    header += ("b_"+x+',')
+                for x in varNames:
+                    header += ("se_"+x+',')
+                
+
                 #print and save results
                 self.output_diag(aicc,trS,R2)
-                self.save_results(data)
+                self.save_results(data,header)
             
             return
         
@@ -319,16 +333,8 @@ class FastGWR:
             print("R2:",R2)
             
             
-    def save_results(self,data):
+    def save_results(self,data,header):
         if self.comm.rank == 0:
-            header="index,residual,influ,"
-            varNames = np.genfromtxt(self.fname, dtype=str, delimiter=',',names=True, max_rows=1).dtype.names[3:]
-            if self.constant:
-                varNames = ['intercept'] + list(varNames)
-            for x in varNames:
-                header += ("b_"+x+',')
-            for x in varNames:
-                header += ("se_"+x+',')
             np.savetxt(self.fout, data, delimiter=',',header=header[:-1],comments='')
         
         
