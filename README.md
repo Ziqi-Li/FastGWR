@@ -34,11 +34,19 @@ Multi-scale GWR model added!
 
     `pip install fastgwr`
     
-  
+
+### Testing 
+`fastgwr testgwr` or `fastgwr testmgwr`
+
+
 ### Example
 Example call to FastGWR which can be called on desktop or HPC:
 ```
 fastgwr run -np 4 -data input.csv -out results.csv -adaptive
+```
+Example call to a MGWR model
+```
+fastgwr run -np 4 -data input.csv -out results.csv -adaptive - mgwr
 ```
 ```
 where:
@@ -69,6 +77,8 @@ Y-coord: Y coordinate of the location point
 y: dependent variable
 X1...Xk: independent variables
 ```
+
+
 
 ### Citation
 
