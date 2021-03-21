@@ -42,11 +42,11 @@ Multi-scale GWR model added!
 ### Example
 Example call to FastGWR which can be called on desktop or HPC:
 ```
-fastgwr run -np 4 -data input.csv -out results.csv -adaptive
+fastgwr run -np 4 -data input.csv -out results.csv -adaptive -constant
 ```
 Example call to an MGWR model
 ```
-fastgwr run -np 4 -data input.csv -out results.csv -adaptive - mgwr
+fastgwr run -np 4 -data input.csv -out results.csv -adaptive -mgwr -constant
 ```
 ```
 where:
