@@ -14,13 +14,15 @@ class FastMGWR(FastGWR):
 
     def __init__(self, comm, parser):
         FastGWR.__init__(self, comm, parser)
-
-        #self.X = (self.X - np.mean(self.X,axis=0))/np.std(self.X, axis=0)
-        self.X = (self.X - np.mean(self.X,axis=0))
-        #self.y = (self.y - np.mean(self.y,axis=0))/np.std(self.y, axis=0)
         if self.constant:
+            stds = np.std(self.X, axis=0)
+            stds[0] = 1
+            self.X = (self.X - np.mean(self.X,axis=0))/stds
             self.X[:,0] = 1
-        
+        else:
+            self.X = (self.X - np.mean(self.X,axis=0))/np.std(self.X, axis=0)
+        self.y = (self.y - np.mean(self.y,axis=0))/np.std(self.y, axis=0)
+            
         
     def backfitting(self):
         if self.comm.rank ==0:
@@ -28,7 +30,8 @@ class FastMGWR(FastGWR):
             print("Data are standardized")
         
         #Initalization
-        betas,bw = self.fit(mgwr=True)
+        betas,bw = self.fit(init_mgwr=True,mgwr=True)
+
         self.bw_init = bw
         
         if self.comm.rank ==0:
@@ -47,7 +50,7 @@ class FastMGWR(FastGWR):
                 temp_y = (XB[:,j] + err).reshape(-1,1)
                 temp_X = self.X[:,j].reshape(-1,1)
                 
-                betas,bw_j = self.fit(y=temp_y,X=temp_X,mgwr=True)
+                betas,bw_j = self.fit(y=temp_y,X=temp_X,init_mgwr=False,mgwr=True)
                 XB_j = (betas*temp_X).reshape(-1)
                 err = temp_y.reshape(-1) - XB_j
                 newXB[:,j] = XB_j
@@ -148,7 +151,6 @@ class FastMGWR(FastGWR):
         if self.comm.rank == 0:
             ENP_j = np.sum(np.vstack(ENP_list), axis=0)
             CCT = np.sum(np.vstack(CCT_list), axis=0)
-            bse = np.sqrt(CCT)
             
             header="index,residual,"
             varNames = np.genfromtxt(self.fname, dtype=str, delimiter=',',names=True, max_rows=1).dtype.names[3:]
@@ -159,12 +161,16 @@ class FastMGWR(FastGWR):
             for x in varNames:
                 header += ("se_"+x+',')
             
-            index = np.arange(self.n).reshape(-1,1)
-            output = np.hstack([index,self.err.reshape(-1,1),self.params,bse])
-        
+            
             trS = np.sum(ENP_j)
+            sigma2_v1 = self.RSS/(self.n-trS)
             aicc = self.compute_aicc(self.RSS, trS)
             self.output_diag(aicc,ENP_j,self.R2)
+            
+            bse = np.sqrt(CCT*sigma2_v1)
+            index = np.arange(self.n).reshape(-1,1)
+            output = np.hstack([index,self.err.reshape(-1,1),self.params,bse])
+            
             self.save_results(output,header)
             
         return

@@ -11,12 +11,12 @@ def main():
 @click.option("-np", default=4, required=True)
 @click.option("-data", required=True)
 @click.option("-out", default="fastgwr_rslt.csv", required=False)
-@click.option("-adaptive/-fixed" ,default=True, required=True)
+@click.option("-adaptive/-fixed" ,default=True,required=True)
 @click.option("-constant", required=False, is_flag=True)
 @click.option("-bw", required=False)
 @click.option("-minbw", required=False)
 @click.option("-chunks", required=False)
-@click.option("-mgwr", default=False, required=False, is_flag=True)
+@click.option("-mgwr", default=False, required=False)
 def run(np, data, out, adaptive, constant, bw, minbw, mgwr, chunks):
     """Fast(M)GWR"""
     command = 'mpiexec ' + ' -np ' + str(np) + ' python ' + ' fastgwr/fastgwr_mpi.py ' + ' -data ' + data + ' -out ' + out

@@ -86,27 +86,23 @@ class FastGWR:
         self.coords = input[:,:2]
         
         
-    def set_search_range(self):
+    def set_search_range(self,init_mgwr=False,mgwr=False):
         if self.fixed:
-            minbw = float('Inf')
-            maxbw = -100
-            for i in range(self.n):
-                dist = cdist([self.coords[i]],self.coords)
-                tempmax = np.max(dist)
-                tempmin = np.min(dist[np.nonzero(dist)])
-                if tempmax > maxbw:
-                    maxbw = tempmax * 2
-                if tempmin < minbw:
-                    minbw = tempmin / 2
-                    
-            self.maxbw = maxbw
+            max_dist = np.max(np.array([np.max(cdist([self.coords[i]],self.coords)) for i in range(self.n)]))
+            self.maxbw = max_dist*2
+            
             if self.minbw is None:
-                self.minbw = minbw
+                min_dist = np.min(np.array([np.min(np.delete( cdist(self.coords[[i]],self.coords),i)) for i in range(self.n)]))
+                
+                self.minbw = min_dist/2
             
         else:
             self.maxbw = self.n
+
             if self.minbw is None:
                 self.minbw = 40 + 2 * self.k
+            if not init_mgwr:
+                self.minbw = 40 + 2
                 
                 
     def build_wi(self, i, bw):
@@ -294,7 +290,7 @@ class FastGWR:
         return
         
    
-    def fit(self, y=None, X=None, mgwr=False):
+    def fit(self, y=None, X=None, init_mgwr=False, mgwr=False):
     
         if y is None:
             y = self.y
@@ -304,7 +300,7 @@ class FastGWR:
             return
         
         if self.comm.rank ==0:
-            self.set_search_range()
+            self.set_search_range(init_mgwr=init_mgwr,mgwr=mgwr)
             if not mgwr:
                 print("Optimal Bandwidth Searching...")
                 print("Range:",self.minbw,self.maxbw)
