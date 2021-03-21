@@ -1,7 +1,8 @@
 
 # FastGWR
 A command line tool for fast parallel computation of Geographically Weighted Regression models.
-  
+### New feature:
+Multi-scale GWR model added!
 
 ### Installation:
 
@@ -49,6 +50,8 @@ where:
 -constant: Adding a constant column vector of 1 to the design matrix.
 -bw 1000: Pre-defined bandwidth parameter. If missing, it will (golden-section) search for the optimal bandwidth and use that to fit GWR model.
 -minbw 45: Lower bound in golden-section search.
+-mgwr: fitting an MGWR model.
+-chunks: #of chunks for MGWR computation (set a large number for reducing memory footprint).
 ```
 
 The input needs to be prepared in this order:
