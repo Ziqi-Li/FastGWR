@@ -11,9 +11,44 @@ from FastGWR import FastGWR
 
 
 class FastMGWR(FastGWR):
+    """
+    FastMGWR class.
+    
+    Parameters
+    ----------
+    comm        : MPI communicators initialized with mpi4py.
+    parser      : The parser object contains model arguments.
+    
+    Attributes
+    ----------
+    comm        : MPI communicators initialized with mpi4py.
+    parser      : The parser object contains model arguments.
+    y           : array
+                  n*1, dependent variable
 
+    X           : array
+                  n*k, independent variables (include constant, if any)
+    coords      : array
+                  n*2, collection of n sets of (x,y) coordinates used for
+                  calibration locations
+    n           : int
+                  number of observations
+    k           : int
+                  number of independent variables
+    minbw       : float
+                  lower-bound bandwidth in the search range
+    maxbw       : float
+                  upper-bound bandwidth in the search range
+
+    """
     def __init__(self, comm, parser):
+        """
+        Initialize class
+        """
+    
         FastGWR.__init__(self, comm, parser)
+        
+        #Standardizaing data
         if self.constant:
             stds = np.std(self.X, axis=0)
             stds[0] = 1
@@ -25,6 +60,12 @@ class FastMGWR(FastGWR):
             
         
     def backfitting(self):
+        """
+        Backfitting MGWR model and obtain parameter estimates
+        and covariate-specific bandwidths.
+        see Fotheringham et al. 2017. Annals of AAG.
+        """
+        
         if self.comm.rank ==0:
             print("MGWR Backfitting...")
             print("Data are standardized")
@@ -81,7 +122,9 @@ class FastMGWR(FastGWR):
     def _chunk_compute_R(self, chunk_id=0):
         """
         Compute MGWR inference by chunks to reduce memory footprint.
+        See Li and Fotheringham, 2020. IJGIS and Yu et al., 2019. GA.
         """
+        
         n = self.n
         k = self.k
         n_chunks = self.n_chunks
@@ -132,7 +175,10 @@ class FastMGWR(FastGWR):
         
     
     def mgwr_fit(self,n_chunks=2):
-    
+        """
+        Fit MGWR model and output results
+        """
+        
         if self.comm.rank ==0:
             print("Computing Inference with",n_chunks,"Chunks")
         self.n_chunks = self.comm.size * n_chunks

@@ -8,9 +8,45 @@ import numpy as np
 from scipy.spatial.distance import cdist,pdist
 import argparse
 
-class FastGWR:
 
+class FastGWR:
+    """
+    FastGWR class.
+    
+    Parameters
+    ----------
+    comm        : MPI communicators initialized with mpi4py.
+    parser      : The parser object contains model arguments.
+    
+    Attributes
+    ----------
+    comm        : MPI communicators initialized with mpi4py.
+    parser      : The parser object contains model arguments.
+    y           : array
+                  n*1, dependent variable
+
+    X           : array
+                  n*k, independent variables (include constant, if any)
+    coords      : array
+                  n*2, collection of n sets of (x,y) coordinates used for
+                  calibration locations
+    n           : int
+                  number of observations
+    k           : int
+                  number of independent variables
+    minbw       : float
+                  lower-bound bandwidth in the search range
+    maxbw       : float
+                  upper-bound bandwidth in the search range
+    bw          : float
+                  user-specified bandwidth
+
+    
+    """
     def __init__(self, comm, parser):
+        """
+        Class Initialization
+        """
         self.comm = comm
         self.parser = parser
         self.X = None
@@ -25,12 +61,13 @@ class FastGWR:
         
         self.parse_gwr_args()
         
+        
         if self.comm.rank ==0:
             self.read_file()
             self.k = self.X.shape[1]
             self.iter = np.arange(self.n)
             
-
+        #broadcast data to other nodes
         self.X = comm.bcast(self.X,root=0)
         self.y = comm.bcast(self.y,root=0)
         self.coords = comm.bcast(self.coords,root=0)
@@ -38,11 +75,15 @@ class FastGWR:
         self.n = comm.bcast(self.n,root=0)
         self.k = comm.bcast(self.k,root=0)
         
+        #split arrays to chunks for parralel processing
         m = int(math.ceil(float(len(self.iter)) / self.comm.size))
         self.x_chunk = self.iter[self.comm.rank*m:(self.comm.rank+1)*m]
         
     
     def parse_gwr_args(self):
+        """
+        Parsing arguments from the command line
+        """
         parser_arg = self.parser.parse_args()
         self.fname = parser_arg.data
         self.fout  = parser_arg.out
@@ -75,6 +116,9 @@ class FastGWR:
 
 
     def read_file(self):
+        """
+        Read file from the path
+        """
         input = np.genfromtxt(self.fname, dtype=float, delimiter=',',skip_header=True)
         #Converting things into matrices
         self.y = input[:,2].reshape(-1,1)
@@ -87,6 +131,9 @@ class FastGWR:
         
         
     def set_search_range(self,init_mgwr=False,mgwr=False):
+        """
+        Define the search range in golden section
+        """
         if self.fixed:
             max_dist = np.max(np.array([np.max(cdist([self.coords[i]],self.coords)) for i in range(self.n)]))
             self.maxbw = max_dist*2
@@ -106,6 +153,9 @@ class FastGWR:
                 
                 
     def build_wi(self, i, bw):
+        """
+        Build the local weight matrix for location i
+        """
     
         dist = cdist([self.coords[i]], self.coords).reshape(-1)
         #dist = np.sqrt(np.sum((self.coords[i] - self.coords)**2, axis=1)).reshape(-1)
@@ -124,6 +174,10 @@ class FastGWR:
         
 
     def local_fit(self, i, y, X, bw, final=False, mgwr=False):
+        """
+        Fit the local regression model at location i
+        """
+    
         wi = self.build_wi(i, bw)
         #Last fitting, return more stats
         if final:
@@ -153,6 +207,9 @@ class FastGWR:
         
 
     def golden_section(self, a, c, function):
+        """
+        Golden-section search bandwidth optimization
+        """
     
         delta = 0.38197
         b = a + delta * np.abs(c-a)
@@ -207,6 +264,9 @@ class FastGWR:
         
     
     def mpi_gwr_fit(self, y, X, bw, final=False, mgwr=False):
+        """
+        Fit the GWR model given a bandwidth
+        """
         k = X.shape[1]
         #Need Parameter estimates
         if final:
@@ -291,7 +351,11 @@ class FastGWR:
         
    
     def fit(self, y=None, X=None, init_mgwr=False, mgwr=False):
-    
+        """
+        Fit the model if given bandwidth then call self.mpi_gwr_fit()
+        If not, then using golden-section search for finding the optimal bandwidth
+        which minimizes AICc.
+        """
         if y is None:
             y = self.y
             X = self.X
@@ -318,18 +382,26 @@ class FastGWR:
    
         
     def compute_aicc(self, RSS, trS):
+        """
+        Compute AICc
+        """
         aicc = self.n*np.log(RSS/self.n) + self.n*np.log(2*np.pi) + self.n*(self.n+trS)/(self.n-trS-2.0)
         return aicc
     
     def output_diag(self,aicc,trS,R2):
+        """
+        Output diagnostics to screen
+        """
         if self.comm.rank == 0:
             print("Diagnostic Information:")
             print("AICc:",aicc)
             print("ENP:",trS)
             print("R2:",R2)
             
-            
     def save_results(self,data,header):
+        """
+        Save results to .csv file
+        """
         if self.comm.rank == 0:
             np.savetxt(self.fout, data, delimiter=',',header=header[:-1],comments='')
         

@@ -9,6 +9,7 @@ from FastGWR import FastGWR
 from FastMGWR import FastMGWR
 
 #Direct Example Call:
+#You can direct call this script by:
 #mpiexec -np 4 python fastgwr_mpi.py -data ../Zillow-test-dataset/zillow_1k.csv -c
 #mpiexec -np 4 python fastgwr_mpi.py -data ../Zillow-test-dataset/zillow_1k.csv -c -mgwr
 
@@ -36,7 +37,7 @@ if __name__ == "__main__":
     t1 = MPI.Wtime()
     n_chunks = parser.parse_args().chunks
     
-    #Fitting MGWR model
+    #Fitting MGWR model, if mgwr in the arguments
     if parser.parse_args().mgwr:
             mgwr_model = FastMGWR(comm,parser)
             mgwr_model.backfitting()

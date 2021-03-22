@@ -21,7 +21,7 @@ dependency_links = [x.strip().replace('git+', '') for x in all_reqs \
 
 setup(
     name="fastgwr",
-    version='0.2.0',
+    version='0.2.1',
     description="Fast Parallel Computation of Geographically Weighted Regression",
     long_description="A MPI-based command line tool for calibrating Geographically Weighted Regression models.",
     author="Ziqi Li",
