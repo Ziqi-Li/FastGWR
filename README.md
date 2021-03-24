@@ -17,7 +17,7 @@ Multi-scale GWR model added!
 
     For PC:
 
-    Microsoft MPI: https://docs.microsoft.com/en-us/message-passing interface/microsoft-mpi
+    Microsoft MPI: https://docs.microsoft.com/en-us/message-passing-interface/microsoft-mpi
 
     or `conda install mpich`
 
