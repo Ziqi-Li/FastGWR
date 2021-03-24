@@ -148,7 +148,7 @@ class FastGWR:
 
             if self.minbw is None:
                 self.minbw = 40 + 2 * self.k
-            if not init_mgwr:
+            if not init_mgwr and mgwr:
                 self.minbw = 40 + 2
                 
                 

@@ -8,61 +8,65 @@ Multi-scale GWR model added!
 
 ### Installation:
 
-1. Install any MPI implementation
-    For Mac/Linux:
+The `fastgwr` is dependent on `mpi4py`. The easiest way to install is to run 
 
-    OpenMPI: https://www.open-mpi.org
-
-    or `conda install openmpi`
-
-    For PC:
-
-    Microsoft MPI: https://docs.microsoft.com/en-us/message-passing-interface/microsoft-mpi
-
-    or `conda install mpich`
-
-  
-    Make sure you have the mpi command on your path by running
-    `mpiexec`
-
-  
-
-2. Install mpi4py
-
-    `conda install mpi4py`
-
- 
-3. Install fastgwr
-
-    `pip install fastgwr`
-    
-
-### Testing 
-You can test the CLI by running 
-`fastgwr testgwr` or `fastgwr testmgwr`
-
-
-### Examples
-Example call to FastGWR which can be called on desktop or HPC:
+```bash
+$ conda install mpi4py
 ```
-fastgwr run -np 4 -data input.csv -out results.csv -adaptive -constant
+It will also install an implementation of MPI based your system (OpenMPI for Mac and Linux; MPICH for Windows).
+
+
+Users may want to check wether the MPI implementation is successfully installed and is on your path by running the `mpiexec` command. Then the `fastgwr` program can be installed using `pip`:
+
+```bash
+$ pip install fastgwr
 ```
-Example call to an MGWR model
+
+After sucessful installation, users can test the functionalities from the command line by running:
+
+```bash
+# Using zillow sample data for testing MGWR model fitting.
+$ fastgwr testgwr
 ```
-fastgwr run -np 4 -data input.csv -out results.csv -adaptive -mgwr -constant
+or
+
+```bash
+# Using zillow sample data for testing MGWR model fitting.
+$ fastgwr testmgwr
 ```
+
+
+# Examples
+Example call to the `fastgwr` to fit GWR model:
+
+```bash
+$ fastgwr run -np 4 -data input.csv -adaptive -constant
+```
+
+Example call to the `fastgwr` to fit MGWR model:
+
+```bash
+$ fastgwr run -np 4 -data input.csv -adaptive -constant -mgwr
 ```
 where:
--np 4: using 4 processors.
--data input.csv: input data matrix. Can also be URL (e.g. "https://raw.github.com/Ziqi-Li/FastGWR/master/Zillow-test-dataset/zillow_1k.csv")
--out results.csv: output GWR results matrix including local parameter estimates, standard errors and local diagnostics.
--adaptive: Adaptive Bisquare kernel.
--fixed: Fixed Gaussian kernel.
--constant: Adding a constant column vector of 1 to the design matrix.
--bw 1000: Pre-defined bandwidth parameter. If missing, it will (golden-section) search for the optimal bandwidth and use that to fit GWR model.
--minbw 45: Lower bound in golden-section search.
--mgwr: fitting an MGWR model.
--chunks: #of chunks for MGWR computation (set to a larger number for reducing memory footprint).
+
+```bash
+-np 4             Number of processors (e.g. 4).
+-data input.csv   Input data matrix. (e.g. input.csv)
+                  Can also be URL (e.g. https://raw.github.com/
+                  Ziqi-Li/FastGWR/master/Zillow-test-dataset/zillow_1k.csv)
+-out results.csv  Output GWR results matrix including local parameter 
+                  estimates, standard errors and local diagnostics.
+-adaptive         Adaptive Bisquare kernel.
+-fixed            Fixed Gaussian kernel.
+-constant         Adding a constant column vector of 1 to the design matrix.
+-bw 1000          Pre-defined bandwidth parameter. If missing, it will
+                  search (golden-section) for the optimal bandwidth and use
+                  that to fit the GWR model.
+-minbw 45         Lower bound in golden-section search. (e.g. 45)
+-mgwr             Fitting an MGWR model.
+-chunks           Number of chunks for MGWR computation (set to a larger 
+                  number to reduce memory footprint).
 ```
 
 The input needs to be prepared in this order:
