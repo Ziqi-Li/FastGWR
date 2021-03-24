@@ -1,9 +1,9 @@
 import os
 import click
-
+import fastgwr
 
 @click.group()
-@click.version_option("0.1.1")
+@click.version_option("0.2.3")
 def main():
     pass
 
@@ -43,7 +43,10 @@ def run(np, data, out, adaptive, constant, bw, minbw, mgwr, chunks):
              Increase the number if run out of memory but should keep it as low as possible.
     
     """
-    command = 'mpiexec ' + ' -np ' + str(np) + ' python ' + ' fastgwr/fastgwr_mpi.py ' + ' -data ' + data + ' -out ' + out
+    
+    mpi_path = os.path.dirname(fastgwr.__file__) + '/fastgwr_mpi.py'
+    
+    command = 'mpiexec ' + ' -np ' + str(np) + ' python ' + mpi_path + ' -data ' + data + ' -out ' + out
     if mgwr:
         command += ' -mgwr '
     
@@ -65,17 +68,28 @@ def run(np, data, out, adaptive, constant, bw, minbw, mgwr, chunks):
 
 
 @main.command()
-def testmgwr():
-    print("Testing MGWR with zillow data:")
-    command = "mpiexec -np 4 python fastgwr/fastgwr_mpi.py -data ../Zillow-test-dataset/zillow_1k.csv -c -mgwr"
+def testgwr():
+    """
+    Testing GWR with zillow data
+    """
+    print("Testing GWR with zillow data:")
+    mpi_path = os.path.dirname(fastgwr.__file__) + '/fastgwr_mpi.py'
+    
+    command = "mpiexec -np 4 python " + mpi_path + " -data https://raw.github.com/Ziqi-Li/FastGWR/master/Zillow-test-dataset/zillow_1k.csv -c"
     os.system(command)
     pass
-    
-    
+
+
 @main.command()
-def testgwr():
-    print("Testing GWR with zillow data:")
-    command = "mpiexec -np 4 python fastgwr/fastgwr_mpi.py -data ../Zillow-test-dataset/zillow_1k.csv -c"
+def testmgwr():
+    """
+    Testing MGWR with zillow data
+    """
+    
+    print("Testing MGWR with zillow data:")
+    mpi_path = os.path.dirname(fastgwr.__file__) + '/fastgwr_mpi.py'
+    
+    command = "mpiexec -np 4 python " + mpi_path + " -data https://raw.github.com/Ziqi-Li/FastGWR/master/Zillow-test-dataset/zillow_1k.csv -c -mgwr"
     os.system(command)
     pass
     
