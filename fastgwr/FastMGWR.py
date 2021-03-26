@@ -129,6 +129,19 @@ class FastMGWR(FastGWR):
         self.err = err
         self.params = newbetas
         
+        if self.comm.rank == 0 and self.estonly:
+            header="index,residual,"
+            varNames = np.genfromtxt(self.fname, dtype=str, delimiter=',',names=True, max_rows=1).dtype.names[3:]
+            if self.constant:
+                varNames = ['intercept'] + list(varNames)
+            for x in varNames:
+                header += ("b_"+x+',')
+            
+            self.output_diag(None,None,self.R2)
+            index = np.arange(self.n).reshape(-1,1)
+            output = np.hstack([index,self.err.reshape(-1,1),self.params])
+            self.save_results(output,header)
+        
         
     def _chunk_compute_R(self, chunk_id=0):
         """
@@ -189,7 +202,8 @@ class FastMGWR(FastGWR):
         """
         Fit MGWR model and output results
         """
-        
+        if self.estonly:
+            return
         if self.comm.rank ==0:
             print("Computing Inference with",n_chunks,"Chunk(s)")
         self.n_chunks = self.comm.size * n_chunks

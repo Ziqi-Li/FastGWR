@@ -10,8 +10,8 @@ from FastMGWR import FastMGWR
 
 #Direct Example Call:
 #You can direct call this script by:
-#mpiexec -np 4 python fastgwr_mpi.py -data ../Zillow-test-dataset/zillow_1k.csv -c
-#mpiexec -np 4 python fastgwr_mpi.py -data ../Zillow-test-dataset/zillow_1k.csv -c -mgwr
+#mpiexec -np 4 python fastgwr_mpi.py -data ../Zillow-test-dataset/zillow_1k.csv
+#mpiexec -np 4 python fastgwr_mpi.py -data ../Zillow-test-dataset/zillow_1k.csv -mgwr -c
 
 if __name__ == "__main__":
 
@@ -27,6 +27,8 @@ if __name__ == "__main__":
     parser.add_argument("-bw")
     parser.add_argument("-minbw")
     parser.add_argument("-chunks",default=1)
+    
+    parser.add_argument('-estonly',action='store_true')
     parser.add_argument('-mgwr',action='store_true')
     parser.add_argument('-f','--fixed',action='store_true')
     parser.add_argument('-a','--adaptive',action='store_true')

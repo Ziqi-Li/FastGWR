@@ -89,6 +89,7 @@ class FastGWR:
         self.fout  = parser_arg.out
         self.fixed = parser_arg.fixed
         self.constant = parser_arg.constant
+        self.estonly = parser_arg.estonly
 
         if parser_arg.bw:
             if self.fixed:
@@ -112,7 +113,7 @@ class FastGWR:
                 
             print("Data Input Path:",self.fname)
             print("Output Result Path:",self.fout)
-            print("Constant:",self.constant)
+            print("Intercept:",self.constant)
 
 
     def read_file(self):

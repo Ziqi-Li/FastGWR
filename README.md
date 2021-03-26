@@ -2,7 +2,7 @@
 ![GitHub](https://img.shields.io/github/license/Ziqi-Li/fastgwr)
 
 # FastGWR
-A command line tool for fast parallel computation of Geographically Weighted Regression models.
+A command line tool for fast parallel computation of Geographically Weighted Regression models (GWR and MGWR).
 ### New feature:
 Multi-scale GWR model added!
 
@@ -34,30 +34,28 @@ $ fastgwr testmgwr
 ```
 
 
-# Examples
+## Examples
 Example call to the `fastgwr` to fit GWR model:
 
 ```bash
-$ fastgwr run -np 4 -data input.csv -adaptive -constant
+$ fastgwr run -np 4 -data input.csv
 ```
 
 Example call to the `fastgwr` to fit MGWR model:
 
 ```bash
-$ fastgwr run -np 4 -data input.csv -adaptive -constant -mgwr
+$ fastgwr run -np 4 -data input.csv -mgwr
 ```
 where:
 
 ```bash
 -np 4             Number of processors (e.g. 4).
 -data input.csv   Input data matrix. (e.g. input.csv)
-                  Can also be URL (e.g. https://raw.github.com/
+                  Can also be an URL (e.g. https://raw.github.com/
                   Ziqi-Li/FastGWR/master/Zillow-test-dataset/zillow_1k.csv)
 -out results.csv  Output GWR results matrix including local parameter 
                   estimates, standard errors and local diagnostics.
--adaptive         Adaptive Bisquare kernel.
--fixed            Fixed Gaussian kernel.
--constant         Adding a constant column vector of 1 to the design matrix.
+-adaptive/-fixed  Adaptive Bisquare kernel (defualt) or Fixed Gaussian kernel.
 -bw 1000          Pre-defined bandwidth parameter. If missing, it will
                   search (golden-section) for the optimal bandwidth and use
                   that to fit the GWR model.
@@ -65,6 +63,7 @@ where:
 -mgwr             Fitting an MGWR model.
 -chunks           Number of chunks for MGWR computation (set to a larger 
                   number to reduce memory footprint).
+-estonly          Allowing MGWR to output parameter estimation only.
 ```
 
 The input needs to be prepared in this order:
@@ -84,12 +83,12 @@ X1...Xk: independent variables
 ```
 See the example Zillow datasets in the repository.
 
-### Results Validation
+## Results Validation
 
 The results are validated against the [mgwr](https://github.com/pysal/mgwr), which can be seen in the [notebooks here](https://github.com/Ziqi-Li/FastGWR/tree/master/validation%20notebook).
 
 
-### Citations
+## Citations
 
 This program is developed based on these two papers:
 

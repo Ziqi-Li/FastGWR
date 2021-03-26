@@ -3,7 +3,7 @@ import click
 import fastgwr
 
 @click.group()
-@click.version_option("0.2.7")
+@click.version_option("0.2.8")
 def main():
     pass
 
@@ -12,44 +12,45 @@ def main():
 @click.option("-data", required=True)
 @click.option("-out", default="fastgwr_rslt.csv", required=False)
 @click.option("-adaptive/-fixed" ,default=True, required=True)
-@click.option("-constant", required=False, is_flag=True)
 @click.option("-bw", required=False)
 @click.option("-minbw", required=False)
-@click.option("-chunks", required=False)
 @click.option("-mgwr", default=False, required=False, is_flag=True)
-def run(np, data, out, adaptive, constant, bw, minbw, mgwr, chunks):
+@click.option("-chunks", required=False)
+@click.option("-estonly", default=False, is_flag=True)
+def run(np, data, out, adaptive, bw, minbw, mgwr, chunks, estonly):
     """
     Fast(M)GWR
     
-    -np: number of processors to use
+    -np:       number of processors to use. (default: 4)
     
-    -data: input data matrix containing y and X
+    -data:     input data matrix containing y and X. Can be URL:
+               e.g. https://raw.github.com/Ziqi-Li/FastGWR/master/Zillow-test-dataset/zillow_1k.csv
     
-    -out: output GWR results (default: "fastgwr_rslt.csv")
+    -out:      output GWR results (default: "fastgwr_rslt.csv").
     
-    -adaptive: using adaptive bisquare kernel
+    -adaptive/-fixed: using an adaptive bisquare kernel (default) or a fixed gaussian kernel.
     
-    -fixed: using fixed gaussian kernel
+    -bw:       using a pre-specified bandwidth to fit GWR.
     
-    -constant: adding a constant vector to the X matrix
+    -minbw:    lower bound in the golden section search in GWR.
     
-    -bw: using a pre-specified bandwidth to fit GWR
+    -mgwr:     fitting an MGWR model.
     
-    -minbw: lower bound in the golden section search
+    -chunks:   number of chunks for MGWR computation (default: 1).
+               Increase the number if run out of memory but should keep it as low as possible.
     
-    -mgwr: fitting an MGWR model
-    
-    -chunks: number of chunks for MGWR computation (default: 1).
-             Increase the number if run out of memory but should keep it as low as possible.
+    -estonly:  output the parameter estimation only for MGWR, no standard errors of the estimates
+               and model diagnostics. Ideal for quick model checking (default: False).
     
     """
     
     mpi_path = os.path.dirname(fastgwr.__file__) + '/fastgwr_mpi.py'
     
     command = 'mpiexec ' + ' -np ' + str(np) + ' python ' + mpi_path + ' -data ' + data + ' -out ' + out
+    command += ' -c '
+    
     if mgwr:
         command += ' -mgwr '
-    
     if adaptive:
         command += ' -a '
     else:
@@ -58,10 +59,10 @@ def run(np, data, out, adaptive, constant, bw, minbw, mgwr, chunks):
         command += (' -bw ' + bw)
     if minbw:
         command += (' -minbw ' + minbw)
-    if constant:
-        command += ' --constant '
     if chunks:
         command += (' -chunks ' + chunks)
+    if estonly:
+        command += (' -estonly ')
         
     os.system(command)
     pass
@@ -88,8 +89,8 @@ def testmgwr():
     
     print("Testing MGWR with zillow data:")
     mpi_path = os.path.dirname(fastgwr.__file__) + '/fastgwr_mpi.py'
-    
-    command = "mpiexec -np 2 python " + mpi_path + " -data https://raw.github.com/Ziqi-Li/FastGWR/master/Zillow-test-dataset/zillow_1k.csv -c -mgwr"
+    print(mpi_path)
+    command = "mpiexec -np 2 python " + mpi_path + " -data https://raw.github.com/Ziqi-Li/FastGWR/master/Zillow-test-dataset/zillow_1k.csv -mgwr -c"
     os.system(command)
     pass
     

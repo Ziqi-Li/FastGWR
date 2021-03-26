@@ -31,11 +31,9 @@ As geospatial data are increasingly available from different sources such as rem
 
 # State of the Field
 
-There are currently existing packages in different languages that allow users to fit GWR and MGWR models. Two most popular open-source options are `mgwr` in python [@oshan2019mgwr] and `GWmodel` in R [@gollini2013gwmodel], both of which provide friendly APIs and are actively maintained. `GWmodel` supports a wide array of geographically weighted models and analysis tools; however, the performance of `GWmodel` is lagged behind and not suitable for large data sets. A comprehensive performance comparison between `GWmodel` and `fastgwr` can be found in @li2019fast and @li2020computational. As for `mgwr`, as mentioned in the previous section, the parallsim of `fastgwr` has been built into `mgwr` by leveraging the `multiprocessing` package. However, the major advantage of `fastgwr` is that the use of MPI-based parallelism allows the program to run in parallel across multiple computer nodes. In this way, `fastgwr` is the only option if the analyst wants to run the GWR program on a high performance computing cluster, which empowers larger-scale analysis that is impossible for a single workstation.  `fastgwr` has been tested on the University of Arizona's Ocelote cluster, and the scalability can be seen in \autoref{fig:example}.
+There are currently existing packages in different languages that allow users to fit GWR and MGWR models. Two most popular open-source options are `mgwr` in python [@oshan2019mgwr] and `GWmodel` in R [@gollini2013gwmodel], both of which provide friendly APIs and are actively maintained. `GWmodel` supports a wide array of geographically weighted models and analysis tools; however, the performance of `GWmodel` is lagged behind and not suitable for large data sets. A comprehensive performance comparison between `GWmodel` and `fastgwr` can be found in @li2019fast and @li2020computational. As for `mgwr`, as mentioned in the previous section, the parallsim of `fastgwr` has been built into `mgwr` by leveraging the `multiprocessing` package. However, the major advantage of `fastgwr` is that the use of MPI-based parallelism allows the program to run in parallel across multiple computer nodes. In this way, `fastgwr` is the only option if the analyst wants to run the GWR program on a high performance computing cluster, which empowers larger-scale analysis that is impossible for a single workstation.  `fastgwr` has been tested on the University of Arizona's Ocelote cluster, and the scalability can be seen in \autoref{fig:example}. The model fitting results of `fastgwr` have been validated against `mgwr` which can be found in the [notebooks](https://github.com/Ziqi-Li/FastGWR/tree/master/validation%20notebook) in the attached [Gituhb repository](https://github.com/Ziqi-Li/FastGWR).
 
-The model fitting results of `fastgwr` have been validated against `mgwr` which can be found in the [notebooks](https://github.com/Ziqi-Li/FastGWR/tree/master/validation%20notebook) in the attached [Gituhb repository](https://github.com/Ziqi-Li/FastGWR).
-
-![Caption for example figure.\label{fig:example}](scalability.png)
+![Caption for example figure.\label{fig:example}](scalability.png){ width=20% }
 
 
 # Installation
@@ -67,29 +65,27 @@ $ fastgwr testmgwr
 
 
 # Examples
-Example call to `fastgwr` to fit a GWR model:
+An example call to `fastgwr` to fit a GWR model:
 
 ```bash
-$ fastgwr run -np 4 -data input.csv -adaptive -constant
+$ fastgwr run -np 4 -data input.csv
 ```
 
-Example call to `fastgwr` to fit an MGWR model:
+An example call to `fastgwr` to fit an MGWR model:
 
 ```bash
-$ fastgwr run -np 4 -data input.csv -adaptive -constant -mgwr
+$ fastgwr run -np 4 -data input.csv -mgwr
 ```
 where:
 
 ```bash
 -np 4             Number of processors (e.g. 4).
 -data input.csv   Input data matrix. (e.g. input.csv)
-                  Can also be URL (e.g. https://raw.github.com/
+                  Can also be an URL (e.g. https://raw.github.com/
                   Ziqi-Li/FastGWR/master/Zillow-test-dataset/zillow_1k.csv)
 -out results.csv  Output GWR results matrix including local parameter 
                   estimates, standard errors and local diagnostics.
--adaptive         Adaptive Bisquare kernel.
--fixed            Fixed Gaussian kernel.
--constant         Adding a constant column vector of 1 to the design matrix.
+-adaptive/-fixed  Adaptive Bisquare kernel (defualt) or Fixed Gaussian kernel.
 -bw 1000          Pre-defined bandwidth parameter. If missing, it will
                   search (golden-section) for the optimal bandwidth and use
                   that to fit the GWR model.
@@ -97,11 +93,10 @@ where:
 -mgwr             Fitting an MGWR model.
 -chunks           Number of chunks for MGWR computation (set to a larger 
                   number to reduce memory footprint).
+-estonly          Allowing MGWR to output parameter estimation only.
 ```
 
 Alternatively, users can call the CLI from a Jupyter Notebook by prefixing `fastgwr` command  the `!` character. [Examples notebooks](https://github.com/Ziqi-Li/FastGWR/tree/master/validation%20notebook) are available in the [Gituhb repository](https://github.com/Ziqi-Li/FastGWR).
-
-
 
 
 # Dependencies
