@@ -1,4 +1,5 @@
-mpi4py==3.0.3
-numpy==1.19.2
+mpi4py
+scipy
+numpy
 click
 twine

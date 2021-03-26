@@ -88,8 +88,6 @@ def testmgwr():
     """
     
     print("Testing MGWR with zillow data:")
-    mpi_path = os.path.dirname(fastgwr.__file__) + '/fastgwr_mpi.py'
-    print(mpi_path)
     command = "mpiexec -np 2 python " + mpi_path + " -data https://raw.github.com/Ziqi-Li/FastGWR/master/Zillow-test-dataset/zillow_1k.csv -mgwr -c"
     os.system(command)
     pass
