@@ -7,6 +7,7 @@ import numpy as np
 from mpi4py import MPI
 from scipy.spatial.distance import cdist,pdist
 import argparse
+from copy import deepcopy
 from FastGWR import FastGWR
 
 
@@ -80,7 +81,7 @@ class FastMGWR(FastGWR):
         XB = betas*self.X
         err = self.y.reshape(-1) - np.sum(XB,axis=1)
         bws = [None]*self.k
-        
+        bw_stable_counter = 0
         bws_history = []
 
         for mgwr_iters in range(1,201):
@@ -90,15 +91,25 @@ class FastMGWR(FastGWR):
             for j in range(self.k):
                 temp_y = (XB[:,j] + err).reshape(-1,1)
                 temp_X = self.X[:,j].reshape(-1,1)
-                
-                betas,bw_j = self.fit(y=temp_y,X=temp_X,init_mgwr=False,mgwr=True)
+
+                if bw_stable_counter >= 5:
+                    #If in backfitting, all bws not changing in bws_same_times (default 5) iterations
+                    bw_j = bws[j]
+                    betas = self.mpi_gwr_fit(temp_y,temp_X,bw_j,final=True,mgwr=True)
+                else:
+                    betas,bw_j = self.fit(y=temp_y,X=temp_X,init_mgwr=False,mgwr=True)
                 XB_j = (betas*temp_X).reshape(-1)
                 err = temp_y.reshape(-1) - XB_j
                 newXB[:,j] = XB_j
                 newbetas[:,j] = betas.reshape(-1)
                 bws[j] = bw_j
+            
+            if (mgwr_iters > 1) and np.all(bws_history[-1] == bws):
+                bw_stable_counter += 1
+            else:
+                bw_stable_counter = 0
         
-            bws_history.append(bws)
+            bws_history.append(deepcopy(bws))
             num = np.sum((newXB - XB)**2) / self.n
             den = np.sum(np.sum(newXB, axis=1)**2)
             score = (num / den)**0.5
@@ -114,7 +125,7 @@ class FastMGWR(FastGWR):
         self.bws_history = np.array(bws_history)
         self.RSS = np.sum(err**2)
         self.TSS = np.sum((self.y - np.mean(self.y))**2)
-        self.R2 = 1- self.RSS/self.TSS
+        self.R2 = 1 - self.RSS/self.TSS
         self.err = err
         self.params = newbetas
         
@@ -180,7 +191,7 @@ class FastMGWR(FastGWR):
         """
         
         if self.comm.rank ==0:
-            print("Computing Inference with",n_chunks,"Chunks")
+            print("Computing Inference with",n_chunks,"Chunk(s)")
         self.n_chunks = self.comm.size * n_chunks
         self.chunks = np.arange(self.comm.rank*n_chunks, (self.comm.rank+1)*n_chunks)
         

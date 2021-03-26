@@ -8,15 +8,13 @@ Multi-scale GWR model added!
 
 ### Installation:
 
-The `fastgwr` is dependent on `mpi4py`. The easiest way to install is to run 
+The `fastgwr` program is dependent on `mpi4py` package and a working MPI implementation. The easiest way to install both dependencies is to use `conda`:
 
 ```bash
 $ conda install mpi4py
 ```
-It will also install an implementation of MPI based your system (OpenMPI for Mac and Linux; MPICH for Windows).
 
-
-Users may want to check wether the MPI implementation is successfully installed and is on your path by running the `mpiexec` command. Then the `fastgwr` program can be installed using `pip`:
+By installing `mpi4py`, `conda` will also install an MPI implementation based on your computer system (OpenMPI for Mac/Linux; MPICH for Windows). Users may want to check whether the MPI implementation is successfully installed and is on your path by running the `mpiexec` command. Then the `fastgwr` program can be installed from PyPi:
 
 ```bash
 $ pip install fastgwr

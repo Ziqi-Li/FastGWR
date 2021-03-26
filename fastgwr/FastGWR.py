@@ -210,7 +210,6 @@ class FastGWR:
         """
         Golden-section search bandwidth optimization
         """
-    
         delta = 0.38197
         b = a + delta * np.abs(c-a)
         d = c - delta * np.abs(c-a)

@@ -3,7 +3,7 @@ import click
 import fastgwr
 
 @click.group()
-@click.version_option("0.2.5")
+@click.version_option("0.2.7")
 def main():
     pass
 
