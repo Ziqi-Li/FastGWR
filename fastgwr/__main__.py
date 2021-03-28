@@ -3,7 +3,7 @@ import click
 import fastgwr
 
 @click.group()
-@click.version_option("0.2.8")
+@click.version_option("0.2.9")
 def main():
     pass
 
@@ -86,8 +86,9 @@ def testmgwr():
     """
     Testing MGWR with zillow data
     """
-    
     print("Testing MGWR with zillow data:")
+    mpi_path = os.path.dirname(fastgwr.__file__) + '/fastgwr_mpi.py'
+    
     command = "mpiexec -np 2 python " + mpi_path + " -data https://raw.github.com/Ziqi-Li/FastGWR/master/Zillow-test-dataset/zillow_1k.csv -mgwr -c"
     os.system(command)
     pass

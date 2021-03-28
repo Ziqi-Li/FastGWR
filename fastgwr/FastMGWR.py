@@ -68,8 +68,8 @@ class FastMGWR(FastGWR):
         """
         
         if self.comm.rank ==0:
-            print("MGWR Backfitting...")
-            print("Data are standardized")
+            print("MGWR Backfitting...",flush=True)
+            print("Data are standardized",flush=True)
         
         #Initalization
         betas,bw = self.fit(init_mgwr=True,mgwr=True)
@@ -77,7 +77,7 @@ class FastMGWR(FastGWR):
         self.bw_init = bw
         
         if self.comm.rank ==0:
-            print("Initialization Done...")
+            print("Initialization Done...",flush=True)
         XB = betas*self.X
         err = self.y.reshape(-1) - np.sum(XB,axis=1)
         bws = [None]*self.k
@@ -116,8 +116,8 @@ class FastMGWR(FastGWR):
             XB = newXB
             
             if self.comm.rank ==0:
-                print("Iter:",mgwr_iters,"SOC:","{:.2e}".format(score))
-                print("bws:",bws)
+                print("Iter:",mgwr_iters,"SOC:","{:.2e}".format(score),flush=True)
+                print("bws:",bws,flush=True)
             
             if score < 1e-5:
                 break
@@ -205,7 +205,7 @@ class FastMGWR(FastGWR):
         if self.estonly:
             return
         if self.comm.rank ==0:
-            print("Computing Inference with",n_chunks,"Chunk(s)")
+            print("Computing Inference with",n_chunks,"Chunk(s)",flush=True)
         self.n_chunks = self.comm.size * n_chunks
         self.chunks = np.arange(self.comm.rank*n_chunks, (self.comm.rank+1)*n_chunks)
         

@@ -104,16 +104,16 @@ class FastGWR:
                 self.minbw = int(parser_arg.minbw)
         
         if self.comm.rank == 0:
-            print("-"*60)
-            print("Starting FastGWR with",self.comm.size,"Processors")
+            print("-"*60,flush=True)
+            print("Starting FastGWR with",self.comm.size,"Processors",flush=True)
             if self.fixed:
-                print("Spatial Kernel: Fixed Gaussian")
+                print("Spatial Kernel: Fixed Gaussian",flush=True)
             else:
-                print("Spatial Kernel: Adaptive Bisquare")
+                print("Spatial Kernel: Adaptive Bisquare",flush=True)
                 
-            print("Data Input Path:",self.fname)
-            print("Output Result Path:",self.fout)
-            print("Intercept:",self.constant)
+            print("Data Input Path:",self.fname,flush=True)
+            print("Output Result Path:",self.fout,flush=True)
+            print("Intercept:",self.constant,flush=True)
 
 
     def read_file(self):
@@ -299,7 +299,7 @@ class FastGWR:
             if self.comm.rank ==0:
                 data = np.vstack(Betas_list)
     
-                print("Fitting GWR Using Bandwidth:",bw)
+                print("Fitting GWR Using Bandwidth:",bw,flush=True)
 
                 RSS = np.sum(data[:,1]**2)
                 TSS = np.sum((y - np.mean(y))**2)
@@ -344,7 +344,7 @@ class FastGWR:
             trS = sum(trS_list)
             aicc = self.compute_aicc(RSS, trS)
             if not mgwr:
-                print("BW, AICc",bw, aicc)
+                print("BW, AICc",bw, aicc,flush=True)
             return aicc
             
         return
@@ -366,8 +366,8 @@ class FastGWR:
         if self.comm.rank ==0:
             self.set_search_range(init_mgwr=init_mgwr,mgwr=mgwr)
             if not mgwr:
-                print("Optimal Bandwidth Searching...")
-                print("Range:",self.minbw,self.maxbw)
+                print("Optimal Bandwidth Searching...",flush=True)
+                print("Range:",self.minbw,self.maxbw,flush=True)
         self.minbw = self.comm.bcast(self.minbw,root=0)
         self.maxbw = self.comm.bcast(self.maxbw,root=0)
 
