@@ -183,7 +183,11 @@ class FastGWR:
         #Last fitting, return more stats
         if final:
             xT = (X * wi).T
-            xtx_inv_xt = np.dot(np.linalg.inv(np.dot(xT, X)), xT)
+            try:
+                xtx_inv_xt = np.dot(np.linalg.inv(np.dot(xT, X)), xT)
+            except np.linalg.LinAlgError as e:
+                xtx_inv_xt = np.dot(np.linalg.pinv(np.dot(xT, X)), xT)
+            # xtx_inv_xt = np.dot(np.linalg.inv(np.dot(xT, X)), xT)
             betas = np.dot(xtx_inv_xt, y).reshape(-1)
             if mgwr:
                 return betas
@@ -199,7 +203,11 @@ class FastGWR:
         else:
             X_new = X*np.sqrt(wi)
             Y_new = y*np.sqrt(wi)
-            temp = np.dot(np.linalg.inv(np.dot(X_new.T,X_new)),X_new.T)
+            try:
+                temp = np.dot(np.linalg.inv(np.dot(X_new.T,X_new)),X_new.T)
+            except np.linalg.LinAlgError as e:
+                temp = np.dot(np.linalg.pinv(np.dot(X_new.T,X_new)),X_new.T)
+            # temp = np.dot(np.linalg.inv(np.dot(X_new.T,X_new)),X_new.T)
             hat = np.dot(X_new[i],temp[:,i])
             yhat = np.sum(np.dot(X_new,temp[:,i]).reshape(-1,1)*Y_new)
             err = Y_new[i][0]-yhat
